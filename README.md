@@ -1,99 +1,44 @@
 # BharatBench — Data-Driven Weather Forecasting Over India
 
-> **A comprehensive benchmarking study of statistical and deep learning models — from Linear Regression to Vision Transformers — for medium-range weather forecasting over the Indian subcontinent, built on the IMDAA reanalysis dataset.**
+> Benchmarking weather forecasting models on the IMDAA dataset — from Linear Regression to Vision Transformers — for medium-range prediction over the Indian subcontinent.
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange?logo=tensorflow)](https://www.tensorflow.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Dataset](https://img.shields.io/badge/Dataset-Kaggle-20BEFF?logo=kaggle)](https://www.kaggle.com/datasets/maslab/bharatbench)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
 
-## 📌 Overview
+## What This Project Does
 
-This project extends the original [BharatBench paper](https://arxiv.org/abs/2405.07534) by implementing and evaluating **three transformer-based architectures** alongside the paper's original baselines (climatology, linear regression, CNN, ConvLSTM) for 5-day lead-time weather forecasting over India.
+This project trains and evaluates a series of forecasting models — starting from simple baselines all the way to transformer architectures — to predict atmospheric variables 5 days ahead over India using the **BharatBench / IMDAA** dataset.
 
-### Target Variables
-| Variable | Description | Unit |
-|---|---|---|
-| **H500** | Geopotential Height at 500 hPa | m |
-| **T850** | Temperature at 850 hPa | K |
-| **T2m** | 2-metre Surface Temperature | K |
-| **TP6h** | 6-hourly Accumulated Precipitation | kg/m² |
+**Target variables:**
+- `HGT_prl` → Geopotential Height at 500 hPa (H500)
+- `TMP_prl` → Temperature at 850 hPa (T850) ← primary benchmark
+- `TMP_2m` → 2-metre Surface Temperature
+- `APCP_sfc` → 6-hourly Accumulated Precipitation
 
-### Models Implemented
-| Model | Type | Notes |
-|---|---|---|
-| Climatology & Persistence | Statistical baseline | Paper baseline |
-| Linear Regression | Statistical | Paper baseline |
-| CNN | Deep Learning | Paper baseline |
-| ConvLSTM | Deep Learning | Paper baseline |
-| **Vanilla ViT** | Transformer | **This work** |
-| **Swin Transformer** | Transformer | **This work** |
-| **Multi-Variable ViT** | Transformer | **This work** |
+**Lead time:** 20 time steps = **5 days**  
+**Test period:** 2019–2020  
+**Grid:** 32×32 at 1.08° resolution, domain 5°N–40°N, 65°E–100°E
 
 ---
 
-## 🗂 Repository Structure
+## Models Implemented
 
-```
-BharatBench-main/
-│
-├── 📓 Notebooks (step-by-step)
-│   ├── 1_climatology_persistence.ipynb   # Baseline: Climatology & Persistence
-│   ├── 2_Linear_Regression.ipynb         # Baseline: Linear Regression
-│   ├── 3_CNN_ConvLSTM.ipynb              # Deep Learning: CNN & ConvLSTM
-│   ├── 4_IMDAA_Regrid.ipynb              # Dataset preprocessing & regridding
-│   ├── 5_Transformer.ipynb               # Vanilla Vision Transformer (ViT)
-│   ├── 6_Swin_Transformer.ipynb          # Swin Transformer
-│   └── 7_MultiVar_Transformer.ipynb      # Multi-Variable ViT
-│
-├── 🐍 Training Scripts
-│   ├── train_transformer.py              # Train Vanilla ViT (all variables)
-│   ├── train_swin_transformer.py         # Train Swin Transformer (T850)
-│   └── train_multivar_transformer.py     # Train Multi-Variable ViT
-│
-├── 📊 Evaluation Scripts
-│   ├── eval_transformer.py               # Evaluate Vanilla ViT
-│   ├── eval_multivar_transformer.py      # Evaluate Multi-Variable ViT
-│   └── eval_all_models.py                # Unified evaluation runner
-│
-├── 📈 Visualization Scripts
-│   ├── plot_heatmaps.py                  # Geographical heatmaps over India
-│   ├── plot_lead_time_error.py           # RMSE/MAE vs lead-time plots
-│   ├── plot_metrics.py                   # Bar chart model comparison
-│   └── plot_paper_heatmaps.py            # Paper-style prediction heatmaps
-│
-├── 📉 Results
-│   ├── transformer_all_metrics.json      # Vanilla ViT results (H500, T2m, TP6h)
-│   ├── transformer_metrics.json          # Vanilla ViT T850 results
-│   ├── swin_metrics.json                 # Swin Transformer T850 results
-│   ├── multivar_metrics.json             # Multi-Variable ViT T850 results
-│   └── paper_benchmark_results.md        # All baseline results from paper
-│
-├── 🗺 Visualizations
-│   ├── geographical_heatmap.png          # Mean field heatmap over India
-│   ├── lead_time_error.png               # Lead-time vs error curves
-│   ├── metrics_comparison.png            # Model comparison bar chart
-│   └── paper_style_heatmaps.png          # Predicted vs actual fields
-│
-├── 📄 Report
-│   └── Project_Report.pdf                # Full 44-page academic project report
-│
-├── india_boundary.geojson                # India map boundary for plotting
-├── environment.yaml                      # Conda environment specification
-├── requirements.txt                      # pip requirements
-├── train_all.sh                          # Script to train all models sequentially
-└── Bharatbenchpaper.pdf                  # Original BharatBench paper (reference)
-```
+| # | Model | Script / Notebook | Notes |
+|---|---|---|---|
+| 1 | Climatology & Persistence | `1_climatology_persistence.ipynb` | Simplest baselines |
+| 2 | Linear Regression | `2_Linear_Regression.ipynb` | Flattens 32×32 → 1024 |
+| 3 | CNN + ConvLSTM | `3_CNN_ConvLSTM.ipynb` | Encoder-decoder, 17 layers |
+| 4 | Vanilla Vision Transformer | `train_transformer.py` / `5_Transformer.ipynb` | Patch-based, global attention |
+| 5 | Swin Transformer | `train_swin_transformer.py` / `6_Swin_Transformer.ipynb` | Shifted window attention |
+| 6 | Multi-Variable ViT | `train_multivar_transformer.py` / `7_MultiVar_Transformer.ipynb` | 4-channel input fusion |
 
 ---
 
-## 📊 Key Results
-
-All models evaluated on **5-day lead time**, test period **2019–2020**.
-
-### T850 (Temperature at 850 hPa) — Primary Benchmark
+## Results (T850, 5-day lead time)
 
 | Model | RMSE (K) ↓ | MAE (K) ↓ | ACC ↑ |
 |---|---|---|---|
@@ -105,200 +50,185 @@ All models evaluated on **5-day lead time**, test period **2019–2020**.
 | Swin Transformer | 2.396 | 1.671 | 0.904 |
 | **Multi-Variable ViT** | **2.270** | **1.591** | **0.914** |
 
-### T2m (Surface Temperature) — Most Dramatic Improvement
+**T2m result:** Vanilla ViT achieves ACC **0.941** vs Linear Regression **0.273** — a 3.4× improvement.
 
-| Model | RMSE (K) ↓ | ACC ↑ |
-|---|---|---|
-| Linear Regression | 3.265 | 0.273 |
-| Climatology | 4.135 | 0.814 |
-| **Vanilla ViT** | **2.421** | **0.941** |
-
-> 🔑 **The Vision Transformer achieves 3.4× better ACC than Linear Regression for T2m**, demonstrating the power of global self-attention for capturing non-linear surface temperature dynamics.
-
-### All Variables — Vanilla ViT (5-day)
-
-| Variable | RMSE | MAE | ACC |
-|---|---|---|---|
-| H500 | 29.909 m | 20.516 m | 0.832 |
-| T850 | 2.281 K | 1.607 K | 0.914 |
-| T2m | 2.421 K | 1.615 K | **0.941** |
-| TP6h | 3.131 kg/m² | 1.158 kg/m² | 0.334 |
+Full per-variable results in:
+- `transformer_all_metrics.json` — H500, T2m, TP6h
+- `transformer_metrics.json` — T850 (Vanilla ViT)
+- `swin_metrics.json` — T850 (Swin)
+- `multivar_metrics.json` — T850 (Multi-Var ViT)
+- `paper_benchmark_results.md` — all baseline numbers
 
 ---
 
-## 🚀 Getting Started
+## Repository Structure
 
-### 1. Clone the Repository
+```
+├── 1_climatology_persistence.ipynb   # Climatology & persistence baselines
+├── 2_Linear_Regression.ipynb         # Linear regression baseline
+├── 3_CNN_ConvLSTM.ipynb              # CNN and ConvLSTM models
+├── 4_IMDAA_Regrid.ipynb              # Data preprocessing / regridding
+├── 5_Transformer.ipynb               # Vanilla ViT training + eval
+├── 6_Swin_Transformer.ipynb          # Swin Transformer training + eval
+├── 7_MultiVar_Transformer.ipynb      # Multi-variable ViT
+│
+├── train_transformer.py              # Train Vanilla ViT (--target flag for variable)
+├── train_swin_transformer.py         # Train Swin Transformer (T850)
+├── train_multivar_transformer.py     # Train Multi-Variable ViT (T850)
+├── train_all.sh                      # Run all transformer training in sequence
+│
+├── eval_transformer.py               # Evaluate Vanilla ViT
+├── eval_multivar_transformer.py      # Evaluate Multi-Variable ViT
+├── eval_all_models.py                # Unified evaluation runner
+│
+├── plot_heatmaps.py                  # Geographical heatmaps (Cartopy + GeoJSON)
+├── plot_lead_time_error.py           # RMSE/MAE vs lead time curves
+├── plot_metrics.py                   # Bar chart comparing all models
+├── plot_paper_heatmaps.py            # Predicted vs actual field maps
+│
+├── geographical_heatmap.png          # Output: mean variable fields over India
+├── lead_time_error.png               # Output: error growth with lead time
+├── metrics_comparison.png            # Output: model comparison chart
+├── paper_style_heatmaps.png          # Output: prediction vs ground truth
+│
+├── transformer_all_metrics.json      # Vanilla ViT results (H500, T2m, TP6h)
+├── transformer_metrics.json          # Vanilla ViT T850
+├── swin_metrics.json                 # Swin T850
+├── multivar_metrics.json             # Multi-Var ViT T850
+├── paper_benchmark_results.md        # All paper baseline numbers
+│
+├── india_boundary.geojson            # India shapefile for map plotting
+├── Bharatbenchpaper.pdf              # Original BharatBench paper (reference)
+├── environment.yaml                  # Conda environment
+└── requirements.txt                  # pip dependencies
+```
 
+---
+
+## Setup
+
+### 1. Clone
 ```bash
 git clone https://github.com/preetyorange/BharatBench.git
 cd BharatBench
 ```
 
-### 2. Set Up Environment
-
-**Using Conda (recommended):**
+### 2. Install dependencies
 ```bash
+# Conda (recommended)
 conda env create -f environment.yaml
 conda activate bharatbench
-```
 
-**Using pip:**
-```bash
+# or pip
 pip install -r requirements.txt
 ```
 
-### 3. Download the Dataset
-
-The dataset is **not included** in this repository due to its large size (~20 GB).
-
-Download from Kaggle:
+### 3. Download the dataset
+The `.nc` file (~708 MB) is not in the repo. Download from Kaggle:
 ```bash
-# Install Kaggle CLI
 pip install kaggle
-
-# Download dataset
 kaggle datasets download -d maslab/bharatbench
 unzip bharatbench.zip -d dataset-bharatbench/
 ```
+The code expects: `dataset-bharatbench/IMDAA_merged_1.08_1990_2020.nc`
 
-Or download manually from: https://www.kaggle.com/datasets/maslab/bharatbench
+---
 
-Place the NetCDF file at: `dataset-bharatbench/IMDAA_merged_1.08_1990_2020.nc`
+## Running the Code
 
-### 4. Run the Notebooks
+### Option A — Notebooks (recommended for step-by-step)
+Run the notebooks in order `1_` → `7_`. Each is self-contained.
 
-Follow the numbered notebooks in order:
-```
-1_climatology_persistence.ipynb  → Statistical baselines
-2_Linear_Regression.ipynb        → Linear model
-3_CNN_ConvLSTM.ipynb             → Deep learning baselines
-4_IMDAA_Regrid.ipynb             → Data preprocessing
-5_Transformer.ipynb              → Vanilla ViT
-6_Swin_Transformer.ipynb         → Swin Transformer
-7_MultiVar_Transformer.ipynb     → Multi-Variable ViT
-```
+### Option B — Scripts (for training transformers)
 
-### 5. Train Models from Scripts
-
+**Train all transformer models:**
 ```bash
-# Train Vanilla ViT for all variables
 bash train_all.sh
+```
 
-# Train individual models
+**Train individually:**
+```bash
+# Vanilla ViT — choose target variable
 python train_transformer.py --target TMP_prl    # T850
 python train_transformer.py --target TMP_2m     # T2m
 python train_transformer.py --target HGT_prl    # H500
 python train_transformer.py --target APCP_sfc   # TP6h
-python train_swin_transformer.py                # Swin (T850)
-python train_multivar_transformer.py            # Multi-Var ViT (T850)
+
+# Swin Transformer (T850 only)
+python train_swin_transformer.py
+
+# Multi-Variable ViT (T850, uses 4 input channels)
+python train_multivar_transformer.py
 ```
 
-### 6. Evaluate
-
+**Evaluate:**
 ```bash
 python eval_transformer.py
 python eval_multivar_transformer.py
 python eval_all_models.py
 ```
 
-### 7. Generate Visualizations
-
+**Generate plots:**
 ```bash
-python plot_heatmaps.py          # Geographical heatmaps
-python plot_lead_time_error.py   # Lead-time error curves
-python plot_metrics.py           # Model comparison chart
-python plot_paper_heatmaps.py    # Paper-style prediction maps
+python plot_heatmaps.py           # Geographical mean field heatmap
+python plot_lead_time_error.py    # Error vs lead time
+python plot_metrics.py            # Model comparison bar chart
+python plot_paper_heatmaps.py     # Predicted vs actual maps
 ```
 
 ---
 
-## 🧠 Model Architectures
+## Model Architecture Summary
 
-### Vanilla Vision Transformer (ViT)
-- Input: 32×32 single-channel atmospheric field
-- Patch size: 4×4 → 64 patches
-- Embedding dim: 64, Heads: 4, Layers: 4
-- Decoder: Reshape + 2× transposed convolutions → 32×32 output
-- Optimizer: Adam (lr=1e-4), Loss: MSE
+### Vanilla ViT (`train_transformer.py`)
+- Input: `(32, 32, 1)` — single variable
+- Patches: 4×4 → 64 patches, projected to dim 64
+- 4 transformer encoder blocks, 4 attention heads
+- Decoder: reshape → 2× Conv2DTranspose → Conv2D output
+- Optimizer: Adam lr=1e-4, loss=MSE, early stopping patience=5
 
-### Swin Transformer
-- Input: 32×32 single-channel
-- Patch embed: 2×2 → 16×16 feature map (dim=64)
-- 4 alternating Swin blocks (window=4, shift=[0,2,0,2])
-- Relative position bias for spatial encoding
-- Optimizer: Adam (lr=5e-5), Loss: MSE
+### Swin Transformer (`train_swin_transformer.py`)
+- Input: `(32, 32, 1)`
+- PatchExtract 2×2 → 16×16 feature map, dim=64
+- 4 SwinTransformerBlocks alternating shift_size=[0,2,0,2], window=4
+- Relative position bias; shifted cyclic masking
+- Decoder: Conv2DTranspose → Conv2D
+- Optimizer: Adam lr=5e-5, loss=MSE
 
-### Multi-Variable ViT
-- Input: 32×32×4 (H500, T850, T2m, TP6h as channels)
-- Architecture: identical to Vanilla ViT
-- Output: single-channel T850 prediction
-- Optimizer: Adam (lr=1e-3), Loss: MSE
-
----
-
-## 📐 Evaluation Metrics
-
-**RMSE** — Root Mean Square Error (penalises large errors):
-$$\text{RMSE} = \frac{1}{N} \sum_i \sqrt{\frac{1}{N_{lat}N_{lon}} \sum_{j,k}(f_{ijk} - t_{ijk})^2}$$
-
-**MAE** — Mean Absolute Error (linear error measure):
-$$\text{MAE} = \frac{1}{N} \sum_i \frac{1}{N_{lat}N_{lon}} \sum_{j,k}|f_{ijk} - t_{ijk}|$$
-
-**ACC** — Anomaly Correlation Coefficient (spatial skill vs climatology):
-$$\text{ACC} = \frac{\sum f'_{ijk} t'_{ijk}}{\sqrt{\sum f'^2_{ijk} \cdot \sum t'^2_{ijk}}}$$
+### Multi-Variable ViT (`train_multivar_transformer.py`)
+- Input: `(32, 32, 4)` — HGT_prl, TMP_prl, TMP_2m, APCP_sfc stacked
+- Each variable normalized independently using training-set stats
+- Same ViT architecture as Vanilla; output is T850 only
+- Optimizer: Adam lr=1e-3, loss=MSE
 
 ---
 
-## 📁 Dataset Details
+## Data Split
 
-| Property | Value |
-|---|---|
-| Source | IMDAA Reanalysis (NCMRWF) |
-| Domain | 5°N–40°N, 65°E–100°E |
-| Resolution | 1.08° (32×32 grid) |
-| Period | 1990–2020 |
-| Temporal resolution | 6-hourly |
-| Format | NetCDF (.nc) |
-| Train / Val / Test | 1990–2017 / 2018 / 2019–2020 |
+| Split | Years | Purpose |
+|---|---|---|
+| Train | 1990–2017 | Model fitting |
+| Validation | 2018 | Hyperparameter tuning / early stopping |
+| Test | 2019–2020 | Final evaluation (never seen during training) |
+
+Normalization (mean/std) computed on training split only and applied to val/test.
 
 ---
 
-## 📄 Project Report
+## Evaluation Metrics
 
-A full **44-page academic project report** is included at [`Project_Report.pdf`](Project_Report.pdf), covering:
-- Introduction & Motivation
-- Literature Review (NWP → Deep Learning → Transformers)
-- Dataset & Methodology
-- Results & Discussions
-- Summary & Conclusions
-- 25 APA-format References
+- **RMSE** — Root Mean Square Error (spatial + temporal average)
+- **MAE** — Mean Absolute Error
+- **ACC** — Anomaly Correlation Coefficient (skill relative to climatology, range −1 to +1)
 
 ---
 
-## 📚 References
+## Acknowledgements
 
-- Choudhury, A., Panda, J., & Mukherjee, A. (2024). *BharatBench: Dataset for data-driven weather forecasting over India*. arXiv:2405.07534
-- Rani et al. (2021). *IMDAA: High-resolution satellite-era reanalysis for the Indian monsoon region*. Journal of Climate.
-- Vaswani et al. (2017). *Attention is all you need*. NeurIPS.
-- Liu et al. (2021). *Swin Transformer: Hierarchical vision transformer using shifted windows*. ICCV.
-- Rasp et al. (2020). *WeatherBench: A benchmark dataset for data-driven weather forecasting*. JAMES.
+Dataset: [IMDAA Reanalysis](https://rds.ncmrwf.gov.in/datasets) — NCMRWF, Ministry of Earth Sciences, Government of India.  
+Original BharatBench paper: [arXiv:2405.07534](https://arxiv.org/abs/2405.07534)
 
 ---
 
-## 🏛 Acknowledgements
-
-Dataset provided by **NCMRWF, Ministry of Earth Sciences, Government of India** under the National Monsoon Mission. IMDAA reanalysis produced in collaboration with the UK Met Office and IMD.
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-<p align="center">
-  <b>Department of Earth and Atmospheric Sciences</b><br>
-  National Institute of Technology, Rourkela — Odisha 769008, India
-</p>
+## License
+MIT — see [LICENSE](LICENSE)
