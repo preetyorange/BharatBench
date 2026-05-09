@@ -1,0 +1,62 @@
+# ──────────────────────────────────────────────
+# BharatBench – .gitignore
+# ──────────────────────────────────────────────
+
+# Large dataset (download from Kaggle)
+dataset-bharatbench/
+*.nc
+
+# Trained model weights (too large for git)
+*.keras
+*.h5
+*.pt
+*.pth
+
+# Python environments
+venv/
+cvdl_env/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.toc
+*.lof
+*.lot
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+report_body.tex
+gen_report_part*.py
+generate_report.py
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test/debug scripts
+test_coords.py
+test_geojson.py
+update_nb.py
+
+# Intermediate / scratch
+paper_text.txt
+transformer_documentation.tex
+transformer_documentation.md
