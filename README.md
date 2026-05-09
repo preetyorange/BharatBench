@@ -19,22 +19,20 @@ This project trains and evaluates a series of forecasting models — starting fr
 - `TMP_2m` → 2-metre Surface Temperature
 - `APCP_sfc` → 6-hourly Accumulated Precipitation
 
-**Lead time:** 20 time steps = **5 days**  
-**Test period:** 2019–2020  
-**Grid:** 32×32 at 1.08° resolution, domain 5°N–40°N, 65°E–100°E
+**Lead time:** 20 time steps = **5 days** | **Test period:** 2019–2020 | **Grid:** 32×32 at 1.08°
 
 ---
 
 ## Models Implemented
 
-| # | Model | Script / Notebook | Notes |
-|---|---|---|---|
-| 1 | Climatology & Persistence | `1_climatology_persistence.ipynb` | Simplest baselines |
-| 2 | Linear Regression | `2_Linear_Regression.ipynb` | Flattens 32×32 → 1024 |
-| 3 | CNN + ConvLSTM | `3_CNN_ConvLSTM.ipynb` | Encoder-decoder, 17 layers |
-| 4 | Vanilla Vision Transformer | `train_transformer.py` / `5_Transformer.ipynb` | Patch-based, global attention |
-| 5 | Swin Transformer | `train_swin_transformer.py` / `6_Swin_Transformer.ipynb` | Shifted window attention |
-| 6 | Multi-Variable ViT | `train_multivar_transformer.py` / `7_MultiVar_Transformer.ipynb` | 4-channel input fusion |
+| # | Model | Location |
+|---|---|---|
+| 1 | Climatology & Persistence | `notebooks/1_climatology_persistence.ipynb` |
+| 2 | Linear Regression | `notebooks/2_Linear_Regression.ipynb` |
+| 3 | CNN + ConvLSTM | `notebooks/3_CNN_ConvLSTM.ipynb` |
+| 4 | Vanilla Vision Transformer | `scripts/training/train_transformer.py` |
+| 5 | Swin Transformer | `scripts/training/train_swin_transformer.py` |
+| 6 | Multi-Variable ViT | `scripts/training/train_multivar_transformer.py` |
 
 ---
 
@@ -50,57 +48,62 @@ This project trains and evaluates a series of forecasting models — starting fr
 | Swin Transformer | 2.396 | 1.671 | 0.904 |
 | **Multi-Variable ViT** | **2.270** | **1.591** | **0.914** |
 
-**T2m result:** Vanilla ViT achieves ACC **0.941** vs Linear Regression **0.273** — a 3.4× improvement.
-
-Full per-variable results in:
-- `transformer_all_metrics.json` — H500, T2m, TP6h
-- `transformer_metrics.json` — T850 (Vanilla ViT)
-- `swin_metrics.json` — T850 (Swin)
-- `multivar_metrics.json` — T850 (Multi-Var ViT)
-- `paper_benchmark_results.md` — all baseline numbers
+Full results in [`results/`](results/).
 
 ---
 
 ## Repository Structure
 
 ```
-├── 1_climatology_persistence.ipynb   # Climatology & persistence baselines
-├── 2_Linear_Regression.ipynb         # Linear regression baseline
-├── 3_CNN_ConvLSTM.ipynb              # CNN and ConvLSTM models
-├── 4_IMDAA_Regrid.ipynb              # Data preprocessing / regridding
-├── 5_Transformer.ipynb               # Vanilla ViT training + eval
-├── 6_Swin_Transformer.ipynb          # Swin Transformer training + eval
-├── 7_MultiVar_Transformer.ipynb      # Multi-variable ViT
+BharatBench/
 │
-├── train_transformer.py              # Train Vanilla ViT (--target flag for variable)
-├── train_swin_transformer.py         # Train Swin Transformer (T850)
-├── train_multivar_transformer.py     # Train Multi-Variable ViT (T850)
-├── train_all.sh                      # Run all transformer training in sequence
+├── notebooks/                          # Step-by-step Jupyter notebooks
+│   ├── 1_climatology_persistence.ipynb
+│   ├── 2_Linear_Regression.ipynb
+│   ├── 3_CNN_ConvLSTM.ipynb
+│   ├── 4_IMDAA_Regrid.ipynb            # Data preprocessing
+│   ├── 5_Transformer.ipynb
+│   ├── 6_Swin_Transformer.ipynb
+│   └── 7_MultiVar_Transformer.ipynb
 │
-├── eval_transformer.py               # Evaluate Vanilla ViT
-├── eval_multivar_transformer.py      # Evaluate Multi-Variable ViT
-├── eval_all_models.py                # Unified evaluation runner
+├── scripts/
+│   ├── training/                       # Model training scripts
+│   │   ├── train_transformer.py        # Vanilla ViT (--target flag)
+│   │   ├── train_swin_transformer.py   # Swin Transformer
+│   │   ├── train_multivar_transformer.py
+│   │   └── train_all.sh                # Train all in sequence
+│   │
+│   ├── evaluation/                     # Evaluation scripts
+│   │   ├── eval_transformer.py
+│   │   ├── eval_multivar_transformer.py
+│   │   └── eval_all_models.py
+│   │
+│   └── visualization/                  # Plot generation scripts
+│       ├── plot_heatmaps.py            # Geographical heatmaps
+│       ├── plot_lead_time_error.py     # Error vs lead time curves
+│       ├── plot_metrics.py             # Model comparison bar chart
+│       └── plot_paper_heatmaps.py      # Predicted vs actual fields
 │
-├── plot_heatmaps.py                  # Geographical heatmaps (Cartopy + GeoJSON)
-├── plot_lead_time_error.py           # RMSE/MAE vs lead time curves
-├── plot_metrics.py                   # Bar chart comparing all models
-├── plot_paper_heatmaps.py            # Predicted vs actual field maps
+├── results/                            # Saved evaluation metrics
+│   ├── transformer_all_metrics.json    # Vanilla ViT: H500, T2m, TP6h
+│   ├── transformer_metrics.json        # Vanilla ViT: T850
+│   ├── swin_metrics.json               # Swin: T850
+│   ├── multivar_metrics.json           # Multi-Var ViT: T850
+│   └── paper_benchmark_results.md      # All baseline numbers from paper
 │
-├── geographical_heatmap.png          # Output: mean variable fields over India
-├── lead_time_error.png               # Output: error growth with lead time
-├── metrics_comparison.png            # Output: model comparison chart
-├── paper_style_heatmaps.png          # Output: prediction vs ground truth
+├── figures/                            # Generated plots
+│   ├── geographical_heatmap.png
+│   ├── lead_time_error.png
+│   ├── metrics_comparison.png
+│   └── paper_style_heatmaps.png
 │
-├── transformer_all_metrics.json      # Vanilla ViT results (H500, T2m, TP6h)
-├── transformer_metrics.json          # Vanilla ViT T850
-├── swin_metrics.json                 # Swin T850
-├── multivar_metrics.json             # Multi-Var ViT T850
-├── paper_benchmark_results.md        # All paper baseline numbers
+├── data/
+│   └── india_boundary.geojson          # India shapefile for map plotting
 │
-├── india_boundary.geojson            # India shapefile for map plotting
-├── Bharatbenchpaper.pdf              # Original BharatBench paper (reference)
-├── environment.yaml                  # Conda environment
-└── requirements.txt                  # pip dependencies
+├── Bharatbenchpaper.pdf                # Original BharatBench paper
+├── environment.yaml                    # Conda environment
+├── requirements.txt                    # pip dependencies
+└── LICENSE
 ```
 
 ---
@@ -130,50 +133,43 @@ pip install kaggle
 kaggle datasets download -d maslab/bharatbench
 unzip bharatbench.zip -d dataset-bharatbench/
 ```
-The code expects: `dataset-bharatbench/IMDAA_merged_1.08_1990_2020.nc`
+Expected path: `dataset-bharatbench/IMDAA_merged_1.08_1990_2020.nc`
 
 ---
 
 ## Running the Code
 
-### Option A — Notebooks (recommended for step-by-step)
-Run the notebooks in order `1_` → `7_`. Each is self-contained.
+### Option A — Notebooks (step-by-step)
+Run notebooks in order from `notebooks/1_` → `notebooks/7_`. Each is self-contained.
 
-### Option B — Scripts (for training transformers)
+### Option B — Training Scripts
 
-**Train all transformer models:**
 ```bash
-bash train_all.sh
+# Train all transformer models
+bash scripts/training/train_all.sh
+
+# Train individually
+python scripts/training/train_transformer.py --target TMP_prl    # T850
+python scripts/training/train_transformer.py --target TMP_2m     # T2m
+python scripts/training/train_transformer.py --target HGT_prl    # H500
+python scripts/training/train_transformer.py --target APCP_sfc   # TP6h
+python scripts/training/train_swin_transformer.py
+python scripts/training/train_multivar_transformer.py
 ```
 
-**Train individually:**
+### Evaluate
 ```bash
-# Vanilla ViT — choose target variable
-python train_transformer.py --target TMP_prl    # T850
-python train_transformer.py --target TMP_2m     # T2m
-python train_transformer.py --target HGT_prl    # H500
-python train_transformer.py --target APCP_sfc   # TP6h
-
-# Swin Transformer (T850 only)
-python train_swin_transformer.py
-
-# Multi-Variable ViT (T850, uses 4 input channels)
-python train_multivar_transformer.py
+python scripts/evaluation/eval_transformer.py
+python scripts/evaluation/eval_multivar_transformer.py
+python scripts/evaluation/eval_all_models.py
 ```
 
-**Evaluate:**
+### Generate Plots
 ```bash
-python eval_transformer.py
-python eval_multivar_transformer.py
-python eval_all_models.py
-```
-
-**Generate plots:**
-```bash
-python plot_heatmaps.py           # Geographical mean field heatmap
-python plot_lead_time_error.py    # Error vs lead time
-python plot_metrics.py            # Model comparison bar chart
-python plot_paper_heatmaps.py     # Predicted vs actual maps
+python scripts/visualization/plot_heatmaps.py
+python scripts/visualization/plot_lead_time_error.py
+python scripts/visualization/plot_metrics.py
+python scripts/visualization/plot_paper_heatmaps.py
 ```
 
 ---
@@ -185,21 +181,20 @@ python plot_paper_heatmaps.py     # Predicted vs actual maps
 - Patches: 4×4 → 64 patches, projected to dim 64
 - 4 transformer encoder blocks, 4 attention heads
 - Decoder: reshape → 2× Conv2DTranspose → Conv2D output
-- Optimizer: Adam lr=1e-4, loss=MSE, early stopping patience=5
+- Optimizer: Adam lr=1e-4, MSE loss, early stopping patience=5
 
 ### Swin Transformer (`train_swin_transformer.py`)
 - Input: `(32, 32, 1)`
 - PatchExtract 2×2 → 16×16 feature map, dim=64
-- 4 SwinTransformerBlocks alternating shift_size=[0,2,0,2], window=4
-- Relative position bias; shifted cyclic masking
-- Decoder: Conv2DTranspose → Conv2D
-- Optimizer: Adam lr=5e-5, loss=MSE
+- 4 SwinTransformerBlocks: alternating shift_size=[0,2,0,2], window=4
+- Relative position bias + cyclic shift masking
+- Optimizer: Adam lr=5e-5, MSE loss
 
 ### Multi-Variable ViT (`train_multivar_transformer.py`)
-- Input: `(32, 32, 4)` — HGT_prl, TMP_prl, TMP_2m, APCP_sfc stacked
+- Input: `(32, 32, 4)` — HGT_prl, TMP_prl, TMP_2m, APCP_sfc stacked as channels
 - Each variable normalized independently using training-set stats
-- Same ViT architecture as Vanilla; output is T850 only
-- Optimizer: Adam lr=1e-3, loss=MSE
+- Same ViT encoder as Vanilla; outputs T850 only
+- Optimizer: Adam lr=1e-3, MSE loss
 
 ---
 
@@ -208,25 +203,17 @@ python plot_paper_heatmaps.py     # Predicted vs actual maps
 | Split | Years | Purpose |
 |---|---|---|
 | Train | 1990–2017 | Model fitting |
-| Validation | 2018 | Hyperparameter tuning / early stopping |
-| Test | 2019–2020 | Final evaluation (never seen during training) |
+| Validation | 2018 | Early stopping |
+| Test | 2019–2020 | Final evaluation |
 
-Normalization (mean/std) computed on training split only and applied to val/test.
-
----
-
-## Evaluation Metrics
-
-- **RMSE** — Root Mean Square Error (spatial + temporal average)
-- **MAE** — Mean Absolute Error
-- **ACC** — Anomaly Correlation Coefficient (skill relative to climatology, range −1 to +1)
+Normalization (mean/std) computed on training split only.
 
 ---
 
 ## Acknowledgements
 
-Dataset: [IMDAA Reanalysis](https://rds.ncmrwf.gov.in/datasets) — NCMRWF, Ministry of Earth Sciences, Government of India.  
-Original BharatBench paper: [arXiv:2405.07534](https://arxiv.org/abs/2405.07534)
+Dataset: [IMDAA Reanalysis](https://rds.ncmrwf.gov.in/datasets) — NCMRWF, Ministry of Earth Sciences, Government of India.
+Original paper: [arXiv:2405.07534](https://arxiv.org/abs/2405.07534)
 
 ---
 
