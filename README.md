@@ -44,7 +44,7 @@ This project trains and evaluates a series of forecasting models — starting fr
 | Linear Regression | 2.202 | 1.540 | 0.920 |
 | CNN | 2.257 | 1.578 | 0.916 |
 | ConvLSTM | 2.381 | 1.658 | 0.905 |
-| Vanilla ViT | 2.281 | 1.607 | 0.914 |
+| Vanilla ViT | 2.281 | 1.612 | 0.914 |
 | Swin Transformer | 2.396 | 1.671 | 0.904 |
 | **Multi-Variable ViT** | **2.270** | **1.591** | **0.914** |
 
