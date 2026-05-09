@@ -131,8 +131,8 @@ All models evaluated on **5-day lead time**, test period **2019–2020**.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/BharatBench-main.git
-cd BharatBench-main
+git clone https://github.com/preetyorange/BharatBench.git
+cd BharatBench
 ```
 
 ### 2. Set Up Environment
